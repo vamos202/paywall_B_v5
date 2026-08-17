@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dziennik Sport — wybór dostępu</title>
+  <style>
+    :root {
+      --red: #d71920;
+      --red-dark: #ad1016;
+      --red-soft: #fff1f2;
+      --ink: #23272d;
+      --muted: #68717b;
+      --line: #dce1e6;
+      --canvas: #f0f2f4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px 16px 160px;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.35;
+    }
+
+    .paywall {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid #d1d7dd;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(25, 34, 45, .12);
+    }
+
+    .hero {
+      padding: 25px 22px 21px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #f7f7f7, #fff);
+      text-align: center;
+    }
+
+    .brand {
+      display: inline-block;
+      margin-bottom: 13px;
+      color: var(--red);
+      font-size: 38px;
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -3px;
+      line-height: 1;
+      transform: skew(-9deg);
+    }
+
+    .hero h1 { margin: 0 0 7px; font-size: 26px; line-height: 1.12; }
+    .hero p { max-width: 340px; margin: 0 auto; color: var(--muted); font-size: 14px; }
+
+    .content { padding: 21px 16px 30px; }
+    .section-label { margin: 0 0 12px; color: #535c66; font-size: 12px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; }
+
+    .period-list { display: grid; gap: 10px; }
+
+    .period-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+      min-height: 92px;
+      padding: 16px 15px;
+      cursor: pointer;
+      border: 1.5px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      color: inherit;
+      text-align: left;
+      transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease, background .16s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .period-card:hover { border-color: #bac2cb; transform: translateY(-1px); }
+    .period-card:focus-visible { outline: 3px solid rgba(215, 25, 32, .28); outline-offset: 2px; }
+
+    .period-card.is-selected {
+      border-color: var(--red);
+      background: #fffafa;
+      box-shadow: 0 4px 13px rgba(215, 25, 32, .10);
+    }
+
+    .period-left { min-width: 0; }
+    .period-title { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 5px; font-size: 19px; font-weight: 900; }
+    .period-copy { color: #66707a; font-size: 12px; line-height: 1.35; }
+    .period-price { margin-top: 5px; color: #30363d; font-size: 14px; font-weight: 800; }
+    .period-card.is-selected .period-price { color: var(--red-dark); }
+
+    .badge {
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: var(--red-soft);
+      color: var(--red-dark);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .25px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .arrow {
+      width: 11px;
+      height: 11px;
+      margin-right: 3px;
+      border-top: 2px solid #68717b;
+      border-right: 2px solid #68717b;
+      transform: rotate(45deg);
+      flex: 0 0 auto;
+    }
+
+    .selected-line {
+      display: none;
+      margin-top: 7px;
+      color: var(--red-dark);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .period-card.is-selected .selected-line { display: block; }
+
+    .trust { margin: 17px 3px 0; color: #707984; font-size: 11px; text-align: center; }
+
+    .sticky-bar {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 5;
+      padding: 12px 16px 16px;
+      border-top: 1px solid #d5dbe1;
+      background: rgba(255,255,255,.97);
+      box-shadow: 0 -8px 24px rgba(27, 35, 45, .12);
+      backdrop-filter: blur(8px);
+    }
+
+    .sticky-inner { width: 100%; max-width: 480px; margin: 0 auto; }
+    .selection-summary { min-height: 18px; margin: 0 0 8px; color: #4c555f; font-size: 12px; text-align: center; }
+    .selection-summary strong { color: #20252b; }
+
+    .cta {
+      display: block;
+      width: 100%;
+      min-height: 49px;
+      cursor: pointer;
+      border: 0;
+      border-radius: 8px;
+      background: var(--red);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      box-shadow: 0 4px 11px rgba(215, 25, 32, .24);
+    }
+
+    .cta:hover { background: var(--red-dark); }
+    .cta:disabled { cursor: default; background: #aab2bb; box-shadow: none; }
+    .billing-info { min-height: 30px; margin: 8px 0 0; color: #68717b; font-size: 10px; line-height: 1.35; text-align: center; }
+
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+      opacity: 0;
+      visibility: hidden;
+      background: rgba(25, 31, 39, 0);
+      transition: opacity .2s ease, visibility .2s ease, background .2s ease;
+    }
+
+    .sheet-backdrop.is-open { opacity: 1; visibility: visible; background: rgba(25, 31, 39, .48); }
+
+    .sheet {
+      width: 100%;
+      max-width: 520px;
+      max-height: min(700px, 90vh);
+      padding: 10px 16px 22px;
+      overflow-y: auto;
+      border-radius: 20px 20px 0 0;
+      background: #fff;
+      box-shadow: 0 -14px 38px rgba(0,0,0,.23);
+      transform: translateY(100%);
+      transition: transform .26s ease;
+    }
+
+    .sheet-backdrop.is-open .sheet { transform: translateY(0); }
+
+    .handle {
+      width: 42px;
+      height: 4px;
+      margin: 0 auto 17px;
+      border-radius: 99px;
+      background: #cbd1d7;
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 15px;
+    }
+
+    .sheet-kicker { margin: 0 0 4px; color: #69727c; font-size: 11px; font-weight: 800; letter-spacing: .45px; text-transform: uppercase; }
+    .sheet h2 { margin: 0; font-size: 24px; line-height: 1.15; }
+    .sheet-subtitle { margin: 5px 0 0; color: #626b75; font-size: 12px; }
+
+    .close-sheet {
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #fff;
+      color: #4f5963;
+      font-size: 25px;
+      line-height: 28px;
+      flex: 0 0 auto;
+    }
+
+    .sheet-label { margin: 0 0 9px; color: #525b65; font-size: 11px; font-weight: 800; letter-spacing: .45px; text-transform: uppercase; }
+
+    .payment-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      width: 100%;
+      margin: 0 0 9px;
+      padding: 14px 13px;
+      cursor: pointer;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: inherit;
+      text-align: left;
+      transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .payment-option:hover { border-color: #b8c0c9; }
+    .payment-option:focus-visible { outline: 3px solid rgba(215, 25, 32, .28); outline-offset: 2px; }
+    .payment-option.is-selected { border-color: var(--red); background: #fff7f7; box-shadow: 0 3px 10px rgba(215,25,32,.09); }
+
+    .radio {
+      width: 19px;
+      height: 19px;
+      margin-top: 2px;
+      border: 2px solid #adb5be;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      position: relative;
+    }
+
+    .payment-option.is-selected .radio { border-color: var(--red); }
+    .payment-option.is-selected .radio::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--red); }
+
+    .option-copy { flex: 1; min-width: 0; }
+    .option-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .option-name { font-size: 14px; font-weight: 800; }
+    .option-price { color: #20262c; font-size: 18px; font-weight: 900; white-space: nowrap; }
+    .payment-option.is-selected .option-price { color: var(--red-dark); }
+    .option-desc { display: block; margin-top: 4px; color: #66707a; font-size: 12px; line-height: 1.35; }
+    .option-note { display: block; margin-top: 5px; color: #505963; font-size: 11px; font-weight: 700; }
+
+    .gift {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 7px;
+      padding: 5px 8px;
+      border: 1px solid #f2c9cb;
+      border-radius: 6px;
+      background: #fff1f2;
+      color: #9e1015;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .gift-icon { display: inline-grid; width: 13px; height: 12px; place-items: center; border: 1.5px solid currentColor; border-radius: 2px; position: relative; }
+    .gift-icon::before { content: ""; position: absolute; top: -5px; width: 7px; height: 5px; border: 1.5px solid currentColor; border-bottom: 0; border-radius: 5px 5px 0 0; }
+    .gift-icon::after { content: ""; width: 2px; height: 12px; background: currentColor; }
+
+    .sheet-confirm { margin-top: 14px; }
+    .sheet-confirm .cta { min-height: 51px; }
+    .sheet-disclosure { margin: 8px 3px 0; color: #68717b; font-size: 10px; line-height: 1.35; text-align: center; }
+
+    .checkout-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(25, 31, 39, .48);
+    }
+
+    .checkout-backdrop.is-open { display: flex; }
+    .checkout-modal { width: 100%; max-width: 480px; padding: 24px 20px 20px; border-radius: 16px; background: #fff; box-shadow: 0 18px 48px rgba(0,0,0,.26); text-align: center; }
+    .checkout-modal h2 { margin: 0 0 8px; font-size: 22px; }
+    .checkout-modal p { margin: 0 0 18px; color: #5d6670; font-size: 14px; }
+    .checkout-modal .success { color: #22763b; font-weight: 800; }
+    .close-checkout { width: 100%; padding: 12px; border: 1px solid #cfd6dd; border-radius: 8px; background: #fff; color: #30363d; font-weight: 800; }
+
+    @media (min-width: 700px) { body { padding-top: 38px; } .paywall { border-radius: 22px; } .content { padding: 22px 22px 32px; } }
+  </style>
+</head>
+<body>
+  <main class="paywall">
+    <header class="hero">
+      <div class="brand">Sport</div>
+      <h1>Czytaj bez ograniczeń</h1>
+      <p>Ekskluzywne wywiady, analizy i newsy z pierwszej ręki.</p>
+    </header>
+
+    <section class="content" aria-label="Wybór okresu dostępu">
+      <p class="section-label">Wybierz okres dostępu</p>
+
+      <div class="period-list">
+        <button class="period-card" type="button" data-period="week">
+          <span class="period-left">
+            <span class="period-title">Tydzień</span>
+            <span class="period-copy">Pełny dostęp na 7 dni</span>
+            <span class="period-price">Od 1 zł za pierwszy tydzień</span>
+            <span class="selected-line"></span>
+          </span>
+          <span class="arrow" aria-hidden="true"></span>
+        </button>
+
+        <button class="period-card is-selected" type="button" data-period="month">
+          <span class="period-left">
+            <span class="period-title">Miesiąc</span>
+            <span class="period-copy">Pełny dostęp na 30 dni</span>
+            <span class="period-price">Od 40 zł</span>
+            <span class="selected-line">Wybrano: subskrypcja miesięczna — 40 zł</span>
+          </span>
+          <span class="arrow" aria-hidden="true"></span>
+        </button>
+
+        <button class="period-card" type="button" data-period="year">
+          <span class="period-left">
+            <span class="period-title">Rok <span class="badge">Super wybór</span></span>
+            <span class="period-copy">Pełny dostęp przez 12 miesięcy</span>
+            <span class="period-price">Od 260 zł • torba w prezencie</span>
+            <span class="selected-line"></span>
+          </span>
+          <span class="arrow" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <p class="trust">BLIK / karta • Bezpieczna płatność • Masz już dostęp? Zaloguj się</p>
+    </section>
+  </main>
+
+  <aside class="sticky-bar" aria-live="polite">
+    <div class="sticky-inner">
+      <p class="selection-summary" id="selectionSummary">Wybrano: <strong>subskrypcja miesięczna — 40 zł</strong></p>
+      <button class="cta" id="mainCta" type="button">Wybieram subskrypcję miesięczną</button>
+      <p class="billing-info" id="billingInfo">Płatność dziś: 40 zł • Kolejne odnowienie: 40 zł za miesiąc • Anulujesz online, kiedy chcesz.</p>
+    </div>
+  </aside>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" aria-hidden="true">
+    <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="handle" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <p class="sheet-kicker">Wybierz sposób płatności</p>
+          <h2 id="sheetTitle">Miesiąc</h2>
+          <p class="sheet-subtitle" id="sheetSubtitle">Pełny dostęp przez 30 dni</p>
+        </div>
+        <button class="close-sheet" id="closeSheet" type="button" aria-label="Zamknij">×</button>
+      </div>
+
+      <p class="sheet-label">Dostęp odnawialny lub jednorazowy</p>
+      <div id="paymentOptions"></div>
+
+      <div class="sheet-confirm">
+        <button class="cta" id="confirmChoice" type="button">Potwierdź wybór</button>
+        <p class="sheet-disclosure" id="sheetDisclosure"></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="checkout-backdrop" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <div class="checkout-modal">
+      <h2 id="checkoutTitle">Demo przejścia do płatności</h2>
+      <p id="checkoutText"></p>
+      <p class="success">W wersji produkcyjnej ten krok przekieruje do checkoutu.</p>
+      <button class="close-checkout" id="closeCheckout" type="button">Wróć do wyboru oferty</button>
+    </div>
+  </div>
+
+  <script>
+    const planData = {
+      week: {
+        title: 'Tydzień', subtitle: 'Pełny dostęp przez 7 dni',
+        options: [
+          { id: 'week-recurring', name: 'Subskrypcja odnawialna', price: 'od 1 zł', desc: 'Cena startowa za pierwszy tydzień, potem 12,50 zł co tydzień', note: 'Anulujesz online, kiedy chcesz', cta: 'Zaczynam za 1 zł', summary: 'subskrypcja tygodniowa — oferta startowa', billing: 'Płatność dziś: 1 zł • Za 7 dni: 12,50 zł, potem co tydzień • Anulujesz online, kiedy chcesz.', modal: 'Wybrano subskrypcję tygodniową: 1 zł za pierwszy tydzień, następnie 12,50 zł co tydzień.' },
+          { id: 'week-onetime', name: 'Płatność jednorazowa', price: '15 zł', desc: 'Dostęp na 7 dni', note: 'Bez automatycznego odnowienia', cta: 'Kupuję dostęp na tydzień', summary: 'dostęp jednorazowy na tydzień — 15 zł', billing: 'Płatność dziś: 15 zł • Dostęp wygasa po 7 dniach • Brak automatycznego odnowienia.', modal: 'Wybrano jednorazowy dostęp na 7 dni za 15 zł.' }
+        ]
+      },
+      month: {
+        title: 'Miesiąc', subtitle: 'Pełny dostęp przez 30 dni',
+        options: [
+          { id: 'month-recurring', name: 'Subskrypcja odnawialna', price: '40 zł', desc: '40 zł co miesiąc • 2 zł za wydanie', note: 'Anulujesz online, kiedy chcesz', cta: 'Wybieram subskrypcję miesięczną', summary: 'subskrypcja miesięczna — 40 zł', billing: 'Płatność dziś: 40 zł • Kolejne odnowienie: 40 zł za miesiąc • Anulujesz online, kiedy chcesz.', modal: 'Wybrano subskrypcję miesięczną za 40 zł co miesiąc.' },
+          { id: 'month-onetime', name: 'Płatność jednorazowa', price: '50 zł', desc: 'Dostęp na 30 dni', note: 'Bez automatycznego odnowienia', cta: 'Kupuję dostęp na miesiąc', summary: 'dostęp jednorazowy na miesiąc — 50 zł', billing: 'Płatność dziś: 50 zł • Dostęp wygasa po 30 dniach • Brak automatycznego odnowienia.', modal: 'Wybrano jednorazowy dostęp na 30 dni za 50 zł.' }
+        ]
+      },
+      year: {
+        title: 'Rok', subtitle: 'Pełny dostęp przez 12 miesięcy',
+        options: [
+          { id: 'year-recurring', name: 'Subskrypcja odnawialna', price: '260 zł', desc: '260 zł co rok • tylko 1 zł za wydanie', note: 'Oryginalna torba w prezencie', gift: true, cta: 'Wybieram subskrypcję roczną', summary: 'subskrypcja roczna — 260 zł', billing: 'Płatność dziś: 260 zł • Kolejne odnowienie: 260 zł za rok • Oryginalna torba w prezencie.', modal: 'Wybrano subskrypcję roczną za 260 zł wraz z oryginalną torbą w prezencie.' },
+          { id: 'year-onetime', name: 'Płatność jednorazowa', price: '390 zł', desc: 'Dostęp na 12 miesięcy', note: 'Bez automatycznego odnowienia', cta: 'Kupuję dostęp na rok', summary: 'dostęp jednorazowy na rok — 390 zł', billing: 'Płatność dziś: 390 zł • Dostęp wygasa po 12 miesiącach • Brak automatycznego odnowienia.', modal: 'Wybrano jednorazowy dostęp na 12 miesięcy za 390 zł.' }
+        ]
+      }
+    };
+
+    const periodCards = [...document.querySelectorAll('.period-card')];
+    const sheetBackdrop = document.getElementById('sheetBackdrop');
+    const closeSheet = document.getElementById('closeSheet');
+    const sheetTitle = document.getElementById('sheetTitle');
+    const sheetSubtitle = document.getElementById('sheetSubtitle');
+    const paymentOptions = document.getElementById('paymentOptions');
+    const confirmChoice = document.getElementById('confirmChoice');
+    const sheetDisclosure = document.getElementById('sheetDisclosure');
+    const selectionSummary = document.getElementById('selectionSummary');
+    const billingInfo = document.getElementById('billingInfo');
+    const mainCta = document.getElementById('mainCta');
+    const checkoutModal = document.getElementById('checkoutModal');
+    const checkoutText = document.getElementById('checkoutText');
+    const closeCheckout = document.getElementById('closeCheckout');
+
+    let activePeriod = 'month';
+    let selectedPlanId = 'month-recurring';
+    let draftPlanId = 'month-recurring';
+
+    function findPlan(id) {
+      return Object.values(planData).flatMap(period => period.options).find(option => option.id === id);
+    }
+
+    function renderSheet(periodKey) {
+      const period = planData[periodKey];
+      sheetTitle.textContent = period.title;
+      sheetSubtitle.textContent = period.subtitle;
+      paymentOptions.innerHTML = period.options.map(option => {
+        const selected = option.id === draftPlanId;
+        return `
+          <button class="payment-option ${selected ? 'is-selected' : ''}" type="button" data-option="${option.id}" aria-pressed="${selected}">
+            <span class="radio" aria-hidden="true"></span>
+            <span class="option-copy">
+              <span class="option-top"><span class="option-name">${option.name}</span><span class="option-price">${option.price}</span></span>
+              <span class="option-desc">${option.desc}</span>
+              ${option.gift ? '<span class="gift"><span class="gift-icon" aria-hidden="true"></span>Oryginalna torba w prezencie</span>' : `<span class="option-note">${option.note}</span>`}
+            </span>
+          </button>`;
+      }).join('');
+      updateSheetButton();
+      [...paymentOptions.querySelectorAll('.payment-option')].forEach(button => {
+        button.addEventListener('click', () => {
+          draftPlanId = button.dataset.option;
+          renderSheet(activePeriod);
+        });
+      });
+    }
+
+    function updateSheetButton() {
+      const plan = findPlan(draftPlanId);
+      confirmChoice.textContent = plan.cta;
+      sheetDisclosure.textContent = plan.billing;
+    }
+
+    function openSheet(periodKey) {
+      activePeriod = periodKey;
+      const currentForPeriod = planData[periodKey].options.find(option => option.id === selectedPlanId);
+      draftPlanId = currentForPeriod ? currentForPeriod.id : planData[periodKey].options[0].id;
+      renderSheet(periodKey);
+      sheetBackdrop.classList.add('is-open');
+      sheetBackdrop.setAttribute('aria-hidden', 'false');
+      closeSheet.focus();
+    }
+
+    function closeSheetPanel() {
+      sheetBackdrop.classList.remove('is-open');
+      sheetBackdrop.setAttribute('aria-hidden', 'true');
+    }
+
+    function applyPlan(planId) {
+      selectedPlanId = planId;
+      const plan = findPlan(planId);
+      const periodKey = Object.keys(planData).find(key => planData[key].options.some(option => option.id === planId));
+      periodCards.forEach(card => {
+        const selected = card.dataset.period === periodKey;
+        card.classList.toggle('is-selected', selected);
+        const line = card.querySelector('.selected-line');
+        line.textContent = selected ? `Wybrano: ${plan.summary}` : '';
+      });
+      selectionSummary.innerHTML = `Wybrano: <strong>${plan.summary}</strong>`;
+      mainCta.textContent = plan.cta;
+      billingInfo.textContent = plan.billing;
+    }
+
+    periodCards.forEach(card => card.addEventListener('click', () => openSheet(card.dataset.period)));
+
+    closeSheet.addEventListener('click', closeSheetPanel);
+    sheetBackdrop.addEventListener('click', event => { if (event.target === sheetBackdrop) closeSheetPanel(); });
+
+    confirmChoice.addEventListener('click', () => {
+      applyPlan(draftPlanId);
+      closeSheetPanel();
+    });
+
+    mainCta.addEventListener('click', () => {
+      checkoutText.textContent = findPlan(selectedPlanId).modal;
+      checkoutModal.classList.add('is-open');
+      closeCheckout.focus();
+    });
+
+    closeCheckout.addEventListener('click', () => checkoutModal.classList.remove('is-open'));
+    checkoutModal.addEventListener('click', event => { if (event.target === checkoutModal) checkoutModal.classList.remove('is-open'); });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeSheetPanel();
+        checkoutModal.classList.remove('is-open');
+      }
+    });
+
+    applyPlan(selectedPlanId);
+  </script>
+</body>
+</html>

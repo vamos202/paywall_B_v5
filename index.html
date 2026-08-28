@@ -15,7 +15,15 @@
     .content { padding:21px 16px 30px; }.section-label { margin:0 0 12px; color:#535c66; font-size:12px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }.period-list { display:grid; gap:10px; }
     .period-card { display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%; min-height:90px; padding:15px; cursor:pointer; border:1.5px solid var(--line); border-radius:13px; background:#fff; color:inherit; text-align:left; transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease,background .16s ease; -webkit-tap-highlight-color:transparent; }
     .period-card:hover { border-color:#bac2cb; transform:translateY(-1px); }.period-card:focus-visible { outline:3px solid rgba(215,25,32,.28); outline-offset:2px; }.period-card.is-selected { border-color:var(--red); background:#fffafa; box-shadow:0 4px 13px rgba(215,25,32,.10); }
-    .period-left { min-width:0; }.period-title { display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin-bottom:5px; font-size:19px; font-weight:900; }.period-copy { color:#66707a; font-size:12px; line-height:1.35; }.period-price { margin-top:5px; color:#30363d; font-size:14px; font-weight:800; }.period-card.is-selected .period-price { color:var(--red-dark); }
+    .period-left { min-width:0; }.period-title { display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin-bottom:5px; font-size:19px; font-weight:900; }.period-copy { color:#66707a; font-size:12px; line-height:1.35; }.period-offer {
+  color: #2b3038;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.period-card.is-selected .period-offer {
+  color: #a80f15;
+}period-price { margin-top:5px; color:#30363d; font-size:14px; font-weight:800; }.period-card.is-selected .period-price { color:var(--red-dark); }
     .badge { padding:4px 7px; border-radius:999px; background:var(--red-soft); color:var(--red-dark); font-size:9px; font-weight:800; letter-spacing:.25px; text-transform:uppercase; white-space:nowrap; }.arrow { width:11px; height:11px; margin-right:3px; border-top:2px solid #68717b; border-right:2px solid #68717b; transform:rotate(45deg); flex:0 0 auto; }.selected-line { display:none; margin-top:7px; color:var(--red-dark); font-size:11px; font-weight:800; }.period-card.is-selected .selected-line { display:block; }
     .trust { margin:17px 3px 0; color:#707984; font-size:11px; text-align:center; }
     .sticky-bar { position:fixed; right:0; bottom:0; left:0; z-index:5; padding:12px 16px 16px; border-top:1px solid #d5dbe1; background:rgba(255,255,255,.97); box-shadow:0 -8px 24px rgba(27,35,45,.12); backdrop-filter:blur(8px); }.sticky-inner { width:100%; max-width:480px; margin:0 auto; }.selection-summary { min-height:18px; margin:0 0 8px; color:#4c555f; font-size:12px; text-align:center; }.selection-summary strong { color:#20252b; }.cta { display:block; width:100%; min-height:49px; cursor:pointer; border:0; border-radius:8px; background:var(--red); color:#fff; font-size:15px; font-weight:800; box-shadow:0 4px 11px rgba(215,25,32,.24); }.cta:hover { background:var(--red-dark); }.billing-info { min-height:30px; margin:8px 0 0; color:#68717b; font-size:10px; line-height:1.35; text-align:center; }
